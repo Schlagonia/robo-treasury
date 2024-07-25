@@ -1,0 +1,20 @@
+name: robo-treasury
+
+plugins:
+  - name: etherscan
+  - name: anvil
+  - name: infura
+  - name: vyper
+
+default_ecosystem: ethereum
+
+ethereum:
+  default_network: mainnet-fork
+  mainnet_fork:
+    default_provider: anvil
+
+anvil:
+  fork:
+    ethereum:
+      mainnet:
+        upstream_provider: infura
