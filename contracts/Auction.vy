@@ -34,6 +34,13 @@ priceMultiplier: public(uint256)
 
 minimumPaymentAmount: public(uint256)
 
+#### TODO:
+
+# 1. Call back hook during buy?
+# 2. Init with a 0 min that works
+# 3. $0 payment fills rek forever
+# 4. Pack storage
+
 @external
 def __init__(
     gov: address,
@@ -50,7 +57,7 @@ def __init__(
     self.priceMultiplier = price_multiplier
     self.minimumPaymentAmount = minimum_payment_amount
     self.startTime = block.timestamp
-    self.startPrice = minimum_payment_amount * price_multiplier / WAD
+    self.startPrice = max(minimum_payment_amount * price_multiplier / WAD, minimum_payment_amount)
 
 
 @external
@@ -104,7 +111,6 @@ def _price(timestamp: uint256) -> uint256:
 def setMinimumPaymentAmount(minimum_payment_amount: uint256):
     assert msg.sender == governance, "!gov"
     old_amount: uint256 = self.minimumPaymentAmount
-    self.minimumPaymentAmount = minimum_payment_amount
 
     price: uint256 = self._price(block.timestamp)
 
@@ -114,6 +120,8 @@ def setMinimumPaymentAmount(minimum_payment_amount: uint256):
         self.epochId = unsafe_add(self.epochId, 1)
         self.startTime = block.timestamp
         self.startPrice = max(self.startPrice * self.priceMultiplier / WAD, minimum_payment_amount)
+
+    self.minimumPaymentAmount = minimum_payment_amount
 
     log UpdatedMinimumPaymentAmount(old_amount, minimum_payment_amount)
 

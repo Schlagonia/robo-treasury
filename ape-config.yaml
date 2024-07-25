@@ -2,18 +2,33 @@ name: robo-treasury
 
 plugins:
   - name: etherscan
-  - name: anvil
+  - name: foundry
   - name: infura
   - name: vyper
+  - name: solidity
 
 default_ecosystem: ethereum
+
+
+dependencies:
+  - name: openzeppelin
+    github: OpenZeppelin/openzeppelin-contracts
+    ref: 4.9.5
+
+
+solidity:
+  version: 0.8.18
+  import_remapping:
+    - "@openzeppelin/contracts=openzeppelin/v4.9.5"
+
 
 ethereum:
   default_network: mainnet-fork
   mainnet_fork:
-    default_provider: anvil
+    default_provider: foundry
 
-anvil:
+
+foundry:
   fork:
     ethereum:
       mainnet:
