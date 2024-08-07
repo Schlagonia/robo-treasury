@@ -55,6 +55,12 @@ def __init__(
     paymentScaler = WAD / pow_mod256(10, convert(ERC20Detailed(_payment_token).decimals(), uint256))
     paymentReceiver = _payment_receiver
 
+
+@view
+@external
+def isEnabled(token_from: address) -> bool:
+    return self.paymentAmount[token_from] != 0
+
 @view
 @external
 def price(token_from: address) -> uint256:
@@ -118,16 +124,19 @@ def setPaymentAmount(token_from: address, payment_amount: uint256):
         change the amount for each token that needs to be used to buy
     """
     assert msg.sender == governance, "!gov"
+    assert token_from != paymentToken, "payment token"
 
     old_amount: uint256 = self.paymentAmount[token_from]
     
     # If enabling the token.
     if old_amount == 0:
+        assert payment_amount != 0, "already zero"
         # Max approve the settlement contract
         assert ERC20(token_from).approve(cowSettlement, max_value(uint256), default_return_value=True)
     
     # If disabling the token.
     if payment_amount == 0:
+        assert old_amount != 0, "already zero"
         # Remove the approval from the settlement contract
         assert ERC20(token_from).approve(cowSettlement, 0, default_return_value=True)
     
